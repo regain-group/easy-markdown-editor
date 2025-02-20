@@ -1933,6 +1933,21 @@ function EasyMDE(options) {
         });
 
         this.codemirror.on('paste', function (cm, event) {
+            const items = event.clipboardData.items;
+            let hasImage = false;
+            let hasText = false;
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file' && items[i].type.startsWith('image/')) {
+                    hasImage = true;
+                } else if (items[i].kind === 'string') {
+                    hasText = true;
+                }
+            }
+            // 文字列とファイルが同時に来た場合はreturnする
+            if (hasImage && hasText) {
+                return;
+            }
             if (options.imageUploadFunction) {
                 self.uploadImagesUsingCustomFunction(options.imageUploadFunction, event.clipboardData.files);
             } else {
